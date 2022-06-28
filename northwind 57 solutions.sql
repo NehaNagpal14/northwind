@@ -135,3 +135,194 @@ avg(freight) from orders
 where year(order_date)= 2015
 group by ship_country 
 order by avg(freight) desc;
+
+-- ans 27
+select ship_country, 
+avg(freight) from orders
+where order_date between '1997-01-01' and '1998-12-01' 
+group by ship_country 
+order by avg(freight) desc
+limit 3;
+
+-- ans 28
+select max(order_date) from orders;
+select ship_country, 
+avg(freight) from orders
+where order_date between '1997-05-06' and '1998-05-06' 
+group by ship_country 
+order by avg(freight) desc
+limit 3;
+
+-- ans 29
+-- employees and orders would join on employee_id
+-- orders and order_details would join on order_id
+-- order_details and products would join on product_id
+select  employees.employee_id,
+last_name,
+orders.order_id, product_name,
+quantity from employees 
+left join orders on
+employees.employee_id = orders.employee_id
+left join order_details on
+orders.order_id = order_details.order_id
+left join products on
+order_details.product_id = products.product_id;
+
+-- ans 30
+select customers.customer_id,
+orders.customer_id as order_placed from customers
+left join orders on
+customers.customer_id = orders.customer_id
+ where orders.customer_id is null;
+
+-- ans 31
+select customers.customer_id,
+orders.customer_id as order_placed
+from customers
+left join orders on
+customers.customer_id = orders.customer_id
+and employee_id = 4
+ where orders.customer_id is null ;
+
+-- ans 32
+select customers.customer_id,
+company_name, orders.order_id,
+sum(quantity* unit_price) as total_price from customers
+left join orders on
+customers.customer_id = orders.customer_id
+left join order_details on
+orders.order_id = order_details.order_id
+where order_date >= '19970101' and order_date < '19980101'
+group by customers.customer_id, 
+company_name, orders.order_id
+having total_price > 10000 ; 
+ 
+-- ans 33
+select customers.customer_id,
+company_name, -- order_details.order_id,
+sum(quantity* unit_price) as total_price from customers
+left join orders on
+customers.customer_id = orders.customer_id
+left join order_details on
+orders.order_id = order_details.order_id
+where order_date >= '19970101' and order_date < '19980101'
+group by customers.customer_id,
+company_name -- order_details.order_id
+having total_price >= 15000
+order by total_price desc ; 
+ 
+-- ans 34
+use northwind_db;
+
+-- ans 35
+select employee_id,
+order_id,                -- not done yet 
+order_date from orders
+where order_date('1996-10-28', interval 1 month);
+
+-- ans 36
+select order_id,
+count(order_id) from order_details
+group by order_id
+order by count(order_id) desc
+limit 10;
+
+-- ans 37
+
+-- ans 38
+select order_id,
+quantity
+ from order_details
+where quantity >=60;
+
+-- ans 39
+select *
+ from order_details
+where quantity >=60;
+
+-- ans 41
+select order_id,
+order_date,
+required_date,
+shipped_date from orders
+where shipped_date >= required_date;
+
+-- ans 42
+select * from orders; 
+select  employee_id, count(employee_id) from orders
+where shipped_date >= required_date
+group by employee_id
+order by count(employee_id) desc;
+
+-- ans 43
+select employees.employee_id,
+last_name,
+count(orders.employee_id) as total_orders from EMPLOYEES
+left join orders
+on employees.employee_id = orders.employee_id                 -- incomplete         
+group by employee_id, last_name;
+
+-- ans 44
+-- ans 45
+-- ans 46
+-- ans 47
+
+-- ans 48
+with cte as(
+select customers.customer_id,
+company_name,
+sum(unit_price*quantity) as total_orders from customers
+left join orders on
+customers.customer_id = orders.customer_id
+left join order_details
+on orders.order_id = order_details.order_id
+where order_date >= '1997-01-01'
+and order_date <= '1997-12-31'
+group by customers.customer_id,
+company_name)
+select customer_id,
+company_name,
+ total_orders,
+case
+    when total_orders between 0 and 1000  then 'low'
+   when total_orders between 1001 and 5000  then 'medium'
+   when total_orders between 5001 and 10000  then 'high'
+    else 'very high'
+    end customer_group
+from cte
+order by customer_id;
+
+-- ans 49
+with cte as(
+select customers.customer_id,
+company_name,
+sum(unit_price*quantity) as total_orders from customers
+left join orders on
+customers.customer_id = orders.customer_id
+left join order_details
+on orders.order_id = order_details.order_id
+where order_date >= '1997-01-01'
+and order_date <= '1997-12-31'
+group by customers.customer_id,
+company_name)
+select customer_id,
+company_name,
+ total_orders,
+case
+    when total_orders >= 0 and total_orders <1000  then 'low'
+   when total_orders >= 1000 and total_orders < 5000 then 'medium'
+   when total_orders >= 5000 and total_orders < 10000 then 'high'
+   when total_orders >= 10000 then 'very high'
+   else 'null' end customer_group
+from cte
+order by customer_id;
+
+-- ans 50
+-- ans 51
+-- ans 52
+select country from suppliers
+union
+select country from customers
+order by country;
+
+-- ans 53
